@@ -1,0 +1,65 @@
+[
+  {
+    "name": "test-chatbot",
+    "slug": "test-chatbot-20260726-200419",
+    "file": "test-chatbot-20260726-200419.md",
+    "abstract": "a ai chatbot for medical college",
+    "created": "20260726-200419"
+  },
+  {
+    "name": "login page",
+    "slug": "login-page-20260726-200517",
+    "file": "login-page-20260726-200517.md",
+    "abstract": "new login page for my ecommerce webapp",
+    "created": "20260726-200517"
+  },
+  {
+    "name": "hand geature monitoring systen",
+    "slug": "hand-geature-monitoring-systen-20260726-200728",
+    "file": "hand-geature-monitoring-systen-20260726-200728.md",
+    "abstract": "The Hand Gesture Analyzer and Recognition System is an AI-based computer vision application that recognizes and analyzes human hand gestures in real time using a webcam or video input. The primary objective of the system is to identify predefined hand gestures accurately and enable natural human-computer interaction without requiring physical contact with input devices.",
+    "created": "20260726-200728"
+  },
+  {
+    "name": "handgetaure system",
+    "slug": "handgetaure-system-20260726-202938",
+    "file": "handgetaure-system-20260726-202938.md",
+    "abstract": "The Hand Gesture Analyzer and Recognition System is an AI-based computer vision application that recognizes and analyzes human hand gestures in real time using a webcam or video input. The primary objective of the system is to identify predefined hand gestures accurately and enable natural human-computer interaction without requiring physical contact with input devices.",
+    "created": "20260726-202938"
+  },
+  {
+    "name": "GDP data analysis project",
+    "slug": "gdp-data-analysis-project-20260726-203919",
+    "file": "gdp-data-analysis-project-20260726-203919.md",
+    "abstract": "gdp data analys project usig python",
+    "created": "20260726-203919"
+  },
+  {
+    "name": "AI Attendance System Using Face Recognition",
+    "slug": "ai-attendance-system-using-face-recognition-20260726-204818",
+    "file": "ai-attendance-system-using-face-recognition-20260726-204818.md",
+    "abstract": "The AI Attendance System Using Face Recognition is an intelligent attendance management application that automates the process of recording attendance through facial recognition technology. Traditional attendance methods are time-consuming and prone to errors or proxy attendance. This system uses computer vision and deep learning techniques to accurately identify individuals and record their attendance in real time.",
+    "created": "20260726-204818"
+  },
+  {
+    "name": "AI Attendance System Using Face Recognition",
+    "slug": "ai-attendance-system-using-face-recognition-20260726-205522",
+    "file": "ai-attendance-system-using-face-recognition-20260726-205522.md",
+    "abstract": "The AI Attendance System Using Face Recognition is an intelligent attendance management application that automates the process of recording attendance through facial recognition technology. Traditional attendance methods are time-consuming and prone to errors or proxy attendance. This system uses computer vision and deep learning techniques to accurately identify individuals and record their attendance in real time.",
+    "created": "20260726-205522"
+  },
+  {
+    "name": "AI Attendance System Using Face Recognition",
+    "slug": "ai-attendance-system-using-face-recognition-20260726-205926",
+    "file": "ai-attendance-system-using-face-recognition-20260726-205926.md",
+    "abstract": "The AI Attendance System Using Face Recognition is an intelligent attendance management application that automates the process of recording attendance through facial recognition technology. Traditional attendance methods are time-consuming and prone to errors or proxy attendance. This system uses computer vision and deep learning techniques to accurately identify individuals and record their attendance in real time.",
+    "created": "20260726-205926"
+  },
+  {
+    "name": "luca",
+    "slug": "luca-20260726-210430",
+    "file": "luca-20260726-210430.md",
+    "abstract": "ai ats resume maker",
+    "created": "20260726-210430"
+  }
+]
