@@ -12,6 +12,7 @@ const state = {
   tasks:          [],
   completedTasks: new Set(),
   rawMarkdown:    '',
+<<<<<<< HEAD
   previousPage:   'home',
   activeProjectArea: '',
   activeProjectVideos: [],
@@ -20,6 +21,9 @@ const state = {
   papersFilter:   'all',      // 'all' or 'ieee'
   allPapers:      [],
   ieeePapers:     []
+=======
+  previousPage:   'home'
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 };
 
 // ── Init ───────────────────────────────────────────────────────
@@ -96,6 +100,7 @@ function renderProjectsGrid() {
 async function openGuide(slug) {
   state.activeSlug    = slug;
   state.completedTasks = new Set();
+<<<<<<< HEAD
   state.activeTab = 'tasks';
   state.papersFilter = 'all';
   state.allPapers = [];
@@ -109,6 +114,8 @@ async function openGuide(slug) {
   document.getElementById('papers-list').style.display = 'none';
   document.getElementById('paper-detail-content').style.display = 'none';
 
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
   showPage('guide');
   showStreamLoader('Loading guide…');
 
@@ -123,10 +130,13 @@ async function openGuide(slug) {
     document.getElementById('guide-project-name').textContent = project ? project.name : slug;
     document.getElementById('guide-project-date').textContent = project ? formatDate(project.created) : '';
 
+<<<<<<< HEAD
     state.activeProjectArea = data.area || '';
     state.activeProjectVideos = data.videos || [];
     state.activeVideoIdx = 0;
 
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
     buildTaskList(data.content);
     hideStreamLoader();
     showDetailEmpty();
@@ -147,6 +157,7 @@ async function startGeneration() {
   state.activeSlug    = null;
   state.tasks         = [];
   state.completedTasks = new Set();
+<<<<<<< HEAD
   state.activeTab = 'tasks';
   state.papersFilter = 'all';
   state.allPapers = [];
@@ -160,6 +171,8 @@ async function startGeneration() {
   document.getElementById('papers-list').style.display = 'none';
   document.getElementById('paper-detail-content').style.display = 'none';
 
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
   document.getElementById('guide-project-name').textContent = name;
   document.getElementById('guide-project-date').textContent  = 'Generating…';
   document.getElementById('task-list').innerHTML = '';
@@ -212,6 +225,7 @@ async function startGeneration() {
     }
 
     state.rawMarkdown = fullText;
+<<<<<<< HEAD
     
     if (state.activeSlug) {
       try {
@@ -229,6 +243,8 @@ async function startGeneration() {
       state.activeVideoIdx = 0;
     }
 
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
     buildTaskList(fullText);
     hideStreamLoader();
     await loadProjects();
@@ -407,6 +423,10 @@ function selectTask(idx) {
   if (task.body && task.body.trim().length > 0) {
     bodyEl.innerHTML = marked.parse(task.body);
   } else {
+<<<<<<< HEAD
+=======
+    // Fallback: construct a meaningful placeholder from the title itself
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
     bodyEl.innerHTML = `
       <p>This step focuses on: <strong>${escHtml(task.title)}</strong>.</p>
       <p>Follow the phase instructions above and refer to sections 7 and 8 of your guide (Core Logic Explained and Testing Strategy) for deeper context on this step.</p>
@@ -429,8 +449,11 @@ function selectTask(idx) {
   document.getElementById('detail-empty').style.display   = 'none';
   document.getElementById('stream-loader').style.display  = 'none';
   document.getElementById('detail-content').style.display = 'flex';
+<<<<<<< HEAD
 
   renderVideoSection();
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 }
 
 // ── Toggle Task Completion ─────────────────────────────────────
@@ -466,6 +489,7 @@ function updateProgress() {
   document.getElementById('progress-label').textContent = `${done} of ${total} tasks completed`;
 }
 
+<<<<<<< HEAD
 // ── Tabs Switching (Tasks vs Papers) ───────────────────────────
 function switchGuideTab(tabName) {
   state.activeTab = tabName;
@@ -621,13 +645,18 @@ function selectPaper(idx) {
   document.getElementById('paper-detail-content').style.display = 'flex';
 }
 
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 // ── Stream Loader Helpers ──────────────────────────────────────
 function showStreamLoader(msg) {
   document.getElementById('stream-text').textContent      = msg;
   document.getElementById('stream-loader').style.display  = 'flex';
   document.getElementById('detail-empty').style.display   = 'none';
   document.getElementById('detail-content').style.display = 'none';
+<<<<<<< HEAD
   document.getElementById('paper-detail-content').style.display = 'none';
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 }
 function hideStreamLoader() {
   document.getElementById('stream-loader').style.display = 'none';
@@ -635,6 +664,7 @@ function hideStreamLoader() {
 function showDetailEmpty() {
   document.getElementById('detail-empty').style.display   = 'flex';
   document.getElementById('detail-content').style.display = 'none';
+<<<<<<< HEAD
   document.getElementById('paper-detail-content').style.display = 'none';
   document.getElementById('stream-loader').style.display  = 'none';
   
@@ -648,6 +678,11 @@ function showDetailEmpty() {
 }
 
 
+=======
+  document.getElementById('stream-loader').style.display  = 'none';
+}
+
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 // ── Export Markdown ────────────────────────────────────────────
 async function exportGuide() {
   if (!state.activeSlug) return;
@@ -680,6 +715,7 @@ function formatDate(ts) {
   if (!ts || ts.length < 8) return '';
   return `${ts.slice(6, 8)}/${ts.slice(4, 6)}/${ts.slice(0, 4)}`;
 }
+<<<<<<< HEAD
 
 // ── YouTube Video Player Integration ───────────────────────────
 function renderVideoSection() {
@@ -802,3 +838,5 @@ function getEmbedUrl(url) {
   }
   return '';
 }
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082

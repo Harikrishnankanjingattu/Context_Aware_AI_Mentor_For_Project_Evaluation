@@ -28,9 +28,13 @@ from pathlib import Path
 import time
 import webbrowser
 import threading
+<<<<<<< HEAD
 import csv
 from flask import Flask, render_template, request, jsonify, Response
 import scraper
+=======
+from flask import Flask, render_template, request, jsonify, Response
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 
 try:
     from openai import OpenAI
@@ -71,8 +75,11 @@ NON-NEGOTIABLE RULES — apply to the entire document:
 1. Every step in Section 6 must be written in FULL detail using the exact 5-part structure defined below (title, paragraph, sub-actions, time, complexity). A single sentence or one-line summary for a step is a failure — this applies to every step in every phase, from the first step to the very last one. Do not shorten, compress, or summarize steps later in the document even if the guide is getting long.
 2. Every fact, command, tool name, library, or instruction must be technically accurate and something that actually works in real-world development. Never invent a command, flag, library, or step just to fill space. If you are not fully certain of an exact command or syntax, describe the goal and general approach in plain language instead of fabricating specific syntax.
 3. Do not skip, merge, or abbreviate any of the 12 sections below.
+<<<<<<< HEAD
 4. For large, complex, or hard projects, you must scale the build guide accordingly. Do not write a simple minimal set of tasks. Break down the project into a comprehensive list of 10 to 20 individual steps, ordered chronologically. Every phase must contain all intermediate steps (such as environment bootstrap, schema designs, helper creation, component builds, state integration, testing, etc.) without skipping, combining, or glossing over them.
 5. In Section 6 (Step-by-Step Build Guide), focus heavily on the logic, execution, code setup, coding steps, testing, and practical implementation details of the task itself. Do NOT focus on explaining or describing the project folder structure or file layout details in Section 6, as the folder structure is already fully covered in Section 5.
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 
 Given a project abstract, produce a thorough Markdown document with these exact sections, in this order:
 
@@ -141,9 +148,12 @@ A milestone breakdown (e.g. Week 1, Week 2...) sized to the project's apparent c
 
 Be specific to the abstract given — avoid generic advice that could apply to any project. Assume the reader can code but has not built this exact kind of project before. Use proper Markdown headers and bullet points throughout. Do not use code blocks anywhere in the document."""
 
+<<<<<<< HEAD
 FOLLOWUP_SYSTEM_PROMPT = """You are an expert software architect and mentor. The user has generated a project build guide and is asking follow-up questions about it.
 Answer their questions accurately, clearly, and constructively, focusing on helping them implement the project steps. Keep your answers detailed and practical, but do not use code blocks unless specifically requested. Use markdown styling."""
 
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 
 # ---------------------------------------------------------------------------
 # NVIDIA NIM API (OpenAI-compatible)
@@ -194,6 +204,7 @@ def ask_followup(client: OpenAI, history: list, question: str, on_chunk=None) ->
 
 
 # ---------------------------------------------------------------------------
+<<<<<<< HEAD
 # YouTube Dataset & Classification
 # ---------------------------------------------------------------------------
 
@@ -318,6 +329,8 @@ Example query: "hand gesture recognition deaf communication"
 
 
 # ---------------------------------------------------------------------------
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 # Storage — save/load guides as Markdown, tracked in a JSON index
 # ---------------------------------------------------------------------------
 
@@ -352,6 +365,7 @@ def save_project(name: str, abstract: str, guide_markdown: str) -> Path:
     filepath.write_text(header + guide_markdown, encoding="utf-8")
 
     index = _load_index()
+<<<<<<< HEAD
     
     # Classify the project domain using YouTube dataset areas
     youtube_data = load_youtube_dataset()
@@ -371,13 +385,18 @@ def save_project(name: str, abstract: str, guide_markdown: str) -> Path:
     except Exception as e:
         print(f"Error running paper scraper during project save: {e}")
 
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
     index.append({
         "name": name,
         "slug": slug,
         "file": filepath.name,
         "abstract": abstract,
         "created": timestamp,
+<<<<<<< HEAD
         "area": area
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
     })
     _save_index(index)
     return filepath
@@ -533,6 +552,7 @@ def api_projects():
 def api_get_project(slug):
     try:
         content = load_project(slug)
+<<<<<<< HEAD
         projects = _load_index()
         project = next((p for p in projects if p['slug'] == slug), None)
         
@@ -611,6 +631,9 @@ def api_get_project_papers(slug):
             'all_papers': all_papers,
             'ieee_papers': ieee_papers
         })
+=======
+        return jsonify({'content': content})
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

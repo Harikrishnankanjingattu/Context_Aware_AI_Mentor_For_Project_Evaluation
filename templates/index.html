@@ -101,6 +101,7 @@
       </div>
       <div class="progress-label" id="progress-label">0 of 0 tasks completed</div>
 
+<<<<<<< HEAD
       <!-- Tab Menu -->
       <div class="guide-tabs">
         <button class="guide-tab active" id="tab-tasks" onclick="switchGuideTab('tasks')">
@@ -111,10 +112,13 @@
         </button>
       </div>
 
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
       <!-- Task List -->
       <ul class="task-list" id="task-list">
         <!-- tasks inserted dynamically -->
       </ul>
+<<<<<<< HEAD
 
       <!-- Papers Filter -->
       <div class="papers-filter-wrap" id="papers-filter-wrap" style="display: none;">
@@ -132,6 +136,8 @@
       <ul class="task-list" id="papers-list" style="display: none;">
         <!-- papers inserted dynamically -->
       </ul>
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
     </div>
 
     <!-- Right: Detail View -->
@@ -139,8 +145,13 @@
       <!-- Empty state -->
       <div class="detail-empty" id="detail-empty">
         <div class="detail-empty-icon"><i class="fa-regular fa-hand-pointer"></i></div>
+<<<<<<< HEAD
         <h3 id="empty-title">Select a task to view details</h3>
         <p id="empty-desc">Click any task from the list on the left to see its full description, time estimate, and difficulty level.</p>
+=======
+        <h3>Select a task to view details</h3>
+        <p>Click any task from the list on the left to see its full description, time estimate, and difficulty level.</p>
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
       </div>
 
       <!-- Task detail content -->
@@ -150,6 +161,7 @@
             <span class="badge badge-time" id="detail-time"><i class="fa-regular fa-clock"></i> <span id="detail-time-text">—</span></span>
             <span class="badge badge-diff" id="detail-diff-badge"><i class="fa-solid fa-signal"></i> <span id="detail-diff-text">—</span></span>
           </div>
+<<<<<<< HEAD
           <div class="detail-actions">
             <button class="btn-youtube-search" onclick="searchCurrentTaskOnYoutube()">
               <i class="fa-brands fa-youtube"></i> Search YouTube
@@ -194,6 +206,14 @@
             </div>
           </div>
         </div>
+=======
+          <button class="btn-task-check" id="btn-task-check" onclick="toggleCurrentTask()">
+            <i class="fa-regular fa-circle-check"></i> Mark Complete
+          </button>
+        </div>
+        <h2 class="detail-title" id="detail-title"></h2>
+        <div class="detail-body markdown-body" id="detail-body"></div>
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
       </div>
 
       <!-- Streaming loader (shown during generation) -->

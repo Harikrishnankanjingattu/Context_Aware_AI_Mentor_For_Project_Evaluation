@@ -876,6 +876,7 @@ textarea { resize: none; }
 }
 .no-projects i { font-size: 2.5rem; margin-bottom: 16px; display: block; color: var(--border-strong); }
 .no-projects h3 { font-family: var(--font-head); font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 6px; }
+<<<<<<< HEAD
 
 /* =====================================================
    YOUTUBE VIDEO PLAYER INTEGRATION & SEARCH (PREMIUM UI)
@@ -1266,3 +1267,5 @@ textarea { resize: none; }
   color: var(--text-primary);
   line-height: 1.5;
 }
+=======
+>>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
