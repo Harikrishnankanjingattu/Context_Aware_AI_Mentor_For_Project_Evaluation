@@ -57,7 +57,12 @@ BASE_URL = "https://integrate.api.nvidia.com/v1"
 MODEL = "nvidia/nemotron-3-super-120b-a12b"
 MAX_TOKENS = 16384
 
-PROJECTS_DIR = Path(__file__).resolve().parent / "projects"
+if os.environ.get("VERCEL") == "1":
+    PROJECTS_DIR = Path("/tmp/projects")
+else:
+    PROJECTS_DIR = Path(__file__).resolve().parent / "projects"
+    
+PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 INDEX_FILE = PROJECTS_DIR / "index.json"
 
 
