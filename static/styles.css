@@ -23,9 +23,9 @@
   --blue-100: #ccfbf1;
   --blue-50:  #f0fdfa;
 
-  /* Text */
-  --text-primary:   #042f2e;
-  --text-secondary: #115e59;
+  /* TEXT COLORS - BLACK / DARK GRAY */
+  --text-primary:   #000000;
+  --text-secondary: #333333;
   --text-muted:     #5eead4;
   --text-on-blue:   #ffffff;
 
@@ -107,7 +107,17 @@ textarea { resize: none; }
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+}
+
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
 }
 
 .brand-icon-wrap {
@@ -419,16 +429,27 @@ textarea { resize: none; }
 
 /* --- Task Panel (Left) --- */
 .task-panel {
-  width: var(--task-panel-w);
-  min-width: var(--task-panel-w);
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  width: 320px;
+  min-width: 320px;
+  background: var(--off-white);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  height: 100%;
-  overflow: hidden;
+  transition: transform 0.3s ease;
+  z-index: 100;
+}
+
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 60px);
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 90;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .task-panel-header {
@@ -1290,33 +1311,49 @@ textarea { resize: none; }
    ===================================================== */
 @media (max-width: 768px) {
   /* Navbar */
+  .mobile-menu-btn {
+    display: block;
+  }
   .navbar {
     padding: 0 15px;
-  }
-  .nav-btn {
-    padding: 5px 10px;
-    font-size: 0.8rem;
   }
   .nav-btn span, .nav-btn i + span {
     display: none; /* Hide text on small screens, show icons */
   }
 
-  /* Guide Workspace */
+  /* Guide Workspace - Sidebar slide-in */
   #page-guide {
-    flex-direction: column;
-    overflow-y: auto; /* Allow entire page to scroll if needed on mobile */
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 60px);
+    overflow: hidden;
   }
 
   .task-panel {
-    width: 100%;
-    min-width: 100%;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    height: 40vh; /* Task list takes top 40% */
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 280px;
+    min-width: 280px;
+    transform: translateX(-100%);
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  }
+
+  .task-panel.mobile-open {
+    transform: translateX(0);
+  }
+
+  .mobile-overlay.active {
+    display: block;
+    opacity: 1;
   }
 
   .detail-panel {
-    height: 60vh; /* Detail panel takes bottom 60% */
+    width: 100%;
+    height: 100%;
   }
 
   /* Projects Grid */

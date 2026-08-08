@@ -26,37 +26,33 @@ def parse_repo_url(url: str):
     return owner, repo.removesuffix(".git")
 
 def fetch_commits(url: str) -> list:
-    """Fetch commits from a GitHub repo URL. Returns a list of dictionaries with commit info."""
+    """Fetch commits from a GitHub repo URL. Returns a list of dictionaries with commit info (max 100)."""
     owner, repo = parse_repo_url(url)
     api_url = f"{GITHUB_API}/repos/{owner}/{repo}/commits"
     params = {"per_page": 100}
     commits_data = []
 
-    while api_url:
-        resp = requests.get(api_url, params=params, timeout=30)
-        
-        if resp.status_code == 404:
-            raise ValueError(f"Repo '{owner}/{repo}' not found (or it's private).")
-        if resp.status_code == 403 and resp.headers.get("X-RateLimit-Remaining") == "0":
-            raise PermissionError("GitHub API rate limit exceeded.")
-        
-        resp.raise_for_status()
+    resp = requests.get(api_url, params=params, timeout=30)
+    
+    if resp.status_code == 404:
+        raise ValueError(f"Repo '{owner}/{repo}' not found (or it's private).")
+    if resp.status_code == 403 and resp.headers.get("X-RateLimit-Remaining") == "0":
+        raise PermissionError("GitHub API rate limit exceeded.")
+    
+    resp.raise_for_status()
 
-        for commit in resp.json():
-            sha = commit["sha"][:7]
-            info = commit.get("commit", {})
-            author = (info.get("author") or {}).get("name", "Unknown")
-            date = (info.get("author") or {}).get("date", "Unknown")
-            message = info.get("message", "").split("\n")[0]
-            commits_data.append({
-                "sha": sha,
-                "author": author,
-                "date": date,
-                "message": message
-            })
-
-        api_url = resp.links.get("next", {}).get("url")
-        params = None  # already included in the "next" URL
+    for commit in resp.json():
+        sha = commit["sha"][:7]
+        info = commit.get("commit", {})
+        author = (info.get("author") or {}).get("name", "Unknown")
+        date = (info.get("author") or {}).get("date", "Unknown")
+        message = info.get("message", "").split("\n")[0]
+        commits_data.append({
+            "sha": sha,
+            "author": author,
+            "date": date,
+            "message": message
+        })
 
     return commits_data
 

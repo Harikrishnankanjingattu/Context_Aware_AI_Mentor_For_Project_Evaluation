@@ -58,6 +58,18 @@ function showPage(name) {
   if (nb) nb.classList.add('active');
 }
 
+function toggleMobileMenu() {
+  const panel = document.querySelector('.task-panel');
+  const overlay = document.getElementById('mobile-overlay');
+  if (panel.classList.contains('mobile-open')) {
+    panel.classList.remove('mobile-open');
+    if (overlay) overlay.classList.remove('active');
+  } else {
+    panel.classList.add('mobile-open');
+    if (overlay) overlay.classList.add('active');
+  }
+}
+
 function showHome() {
   state.previousPage = 'home';
   showPage('home');
@@ -525,6 +537,13 @@ function selectTask(idx) {
   document.getElementById('detail-empty').style.display   = 'none';
   document.getElementById('stream-loader').style.display  = 'none';
   document.getElementById('detail-content').style.display = 'flex';
+
+  if (window.innerWidth <= 768) {
+    const panel = document.querySelector('.task-panel');
+    const overlay = document.getElementById('mobile-overlay');
+    if (panel) panel.classList.remove('mobile-open');
+    if (overlay) overlay.classList.remove('active');
+  }
 }
 
 // ── Task State Logic ──────────────────────────────────────────

@@ -17,6 +17,9 @@
   <!-- ===== TOP NAVBAR ===== -->
   <header class="navbar">
     <div class="nav-brand">
+      <button class="nav-btn mobile-menu-btn" onclick="toggleMobileMenu()" title="Menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
       <div class="brand-icon-wrap"><i class="fa-solid fa-graduation-cap"></i></div>
     </div>
     <nav class="nav-links">
@@ -96,6 +99,7 @@
   </section>
 
   <!-- ===== GUIDE WORKSPACE ===== -->
+  <div id="mobile-overlay" class="mobile-overlay" onclick="toggleMobileMenu()"></div>
   <section id="page-guide" class="page">
     
     <!-- GitHub Link Overlay -->
