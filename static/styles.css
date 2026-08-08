@@ -1311,7 +1311,7 @@ textarea { resize: none; }
    ===================================================== */
 @media (max-width: 768px) {
   /* Navbar */
-  .mobile-menu-btn {
+  body.in-guide .mobile-menu-btn {
     display: block;
   }
   .navbar {

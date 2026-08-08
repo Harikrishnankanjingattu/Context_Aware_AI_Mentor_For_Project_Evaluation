@@ -56,6 +56,8 @@ function showPage(name) {
   document.getElementById('page-' + name).classList.add('active');
   const nb = document.getElementById('nav-' + name);
   if (nb) nb.classList.add('active');
+  
+  document.body.classList.toggle('in-guide', name === 'guide');
 }
 
 function toggleMobileMenu() {
