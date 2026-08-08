@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/styles.css?v=3" />
 </head>
 <body>
 
@@ -18,10 +18,11 @@
   <header class="navbar">
     <div class="nav-brand">
       <div class="brand-icon-wrap"><i class="fa-solid fa-graduation-cap"></i></div>
-      <span class="brand-name">Luca</span>
-      <span class="brand-tag">AI Mentor</span>
     </div>
     <nav class="nav-links">
+      <button class="nav-btn" onclick="editGitHubUrl()" title="Edit Global GitHub Repository">
+        <i class="fa-brands fa-github"></i> Edit GitHub URL
+      </button>
       <button class="nav-btn active" id="nav-home" onclick="showHome()">
         <i class="fa-solid fa-house"></i> Home
       </button>
@@ -31,8 +32,24 @@
     </nav>
   </header>
 
+  <!-- ===== INITIAL SETUP PAGE ===== -->
+  <section id="page-setup" class="page active">
+    <div class="hero-center" style="max-width: 500px; margin: 100px auto;">
+      <div style="font-size: 4rem; color: var(--primary); margin-bottom: 20px;"><i class="fa-brands fa-github"></i></div>
+      <h1 class="hero-title" style="font-size: 2.5rem;">Welcome to Luca</h1>
+      <p class="hero-subtitle">Before we begin, please enter your GitHub repository URL. All generated projects and tasks will be tracked against this repository.</p>
+      
+      <div class="ask-box" style="padding: 30px;">
+        <input type="text" id="global-github-input" class="ask-name" placeholder="e.g., owner/repo" style="margin-bottom: 20px;" />
+        <button class="btn-primary" onclick="saveGlobalGithub()" style="width: 100%;">
+          <i class="fa-solid fa-arrow-right"></i> Continue
+        </button>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== HOME / GENERATE PAGE ===== -->
-  <section id="page-home" class="page active">
+  <section id="page-home" class="page">
     <div class="hero-center">
       <h1 class="hero-title">What's your next project?</h1>
       <p class="hero-subtitle">Describe your idea and Luca will generate a complete, step-by-step roadmap with time estimates and difficulty ratings.</p>
@@ -80,6 +97,18 @@
 
   <!-- ===== GUIDE WORKSPACE ===== -->
   <section id="page-guide" class="page">
+    
+    <!-- GitHub Link Overlay -->
+    <div id="github-overlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 100; align-items: center; justify-content: center; flex-direction: column; padding: 20px;">
+      <div style="background: var(--surface); padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 500px; width: 100%; text-align: center;">
+        <div style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"><i class="fa-brands fa-github"></i></div>
+        <h2 style="margin-bottom: 15px; color: var(--text);">Connect GitHub Repository</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 25px; line-height: 1.5;">To use the AI Mentor and track your tasks, please link your GitHub repository. The bot view will unlock once connected.</p>
+        <input type="text" id="github-overlay-input" placeholder="e.g., owner/repo" style="width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; margin-bottom: 20px; box-sizing: border-box;" />
+        <button onclick="linkGitHubRepoOverlay()" style="background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; width: 100%;"><i class="fa-solid fa-link"></i> Link Repository</button>
+      </div>
+    </div>
+
     <!-- Left: Task List -->
     <div class="task-panel">
       <div class="task-panel-header">
@@ -95,15 +124,28 @@
         </button>
       </div>
 
-      <!-- Progress bar -->
       <div class="progress-wrap">
         <div class="progress-bar" id="progress-bar"></div>
       </div>
       <div class="progress-label" id="progress-label">0 of 0 tasks completed</div>
 
-<<<<<<< HEAD
+      <!-- GitHub Link -->
+      <div class="github-link-wrap" style="padding: 15px; border-bottom: 1px solid var(--border);">
+        <div id="github-unlinked" style="display: flex; gap: 8px;">
+          <input type="text" id="github-repo-input" placeholder="GitHub Repo URL (e.g. owner/repo)" style="flex: 1; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem;" />
+          <button onclick="linkGitHubRepo()" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;"><i class="fa-brands fa-github"></i> Link</button>
+        </div>
+        <div id="github-linked" style="display: none; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.85rem; color: var(--text-secondary);"><i class="fa-brands fa-github"></i> <a id="github-repo-link" href="#" target="_blank" style="color: var(--primary); text-decoration: none;">Repo</a></span>
+          <span class="badge" style="background: var(--blue-50); color: var(--blue-600);"><i class="fa-solid fa-code-commit"></i> <span id="github-commits-count">0</span> Commits</span>
+        </div>
+      </div>
+
       <!-- Tab Menu -->
       <div class="guide-tabs">
+        <button class="guide-tab" id="tab-overview" onclick="switchGuideTab('overview')">
+          <i class="fa-solid fa-file-lines"></i> Overview
+        </button>
         <button class="guide-tab active" id="tab-tasks" onclick="switchGuideTab('tasks')">
           <i class="fa-solid fa-list-check"></i> Tasks
         </button>
@@ -112,13 +154,10 @@
         </button>
       </div>
 
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
       <!-- Task List -->
       <ul class="task-list" id="task-list">
         <!-- tasks inserted dynamically -->
       </ul>
-<<<<<<< HEAD
 
       <!-- Papers Filter -->
       <div class="papers-filter-wrap" id="papers-filter-wrap" style="display: none;">
@@ -136,8 +175,11 @@
       <ul class="task-list" id="papers-list" style="display: none;">
         <!-- papers inserted dynamically -->
       </ul>
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
+
+      <!-- Overview Content -->
+      <div class="overview-list-wrap" id="overview-list-wrap" style="display: none; padding: 20px;">
+        <p style="color: var(--text-muted); font-size: 0.875rem;">The complete guide is displayed in the main detail panel when this tab is selected.</p>
+      </div>
     </div>
 
     <!-- Right: Detail View -->
@@ -145,13 +187,19 @@
       <!-- Empty state -->
       <div class="detail-empty" id="detail-empty">
         <div class="detail-empty-icon"><i class="fa-regular fa-hand-pointer"></i></div>
-<<<<<<< HEAD
         <h3 id="empty-title">Select a task to view details</h3>
         <p id="empty-desc">Click any task from the list on the left to see its full description, time estimate, and difficulty level.</p>
-=======
-        <h3>Select a task to view details</h3>
-        <p>Click any task from the list on the left to see its full description, time estimate, and difficulty level.</p>
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
+      </div>
+      
+      <!-- GitHub Required state -->
+      <div class="detail-empty" id="github-required-empty" style="display:none;">
+        <div class="detail-empty-icon"><i class="fa-brands fa-github"></i></div>
+        <h3>GitHub Repository Required</h3>
+        <p>Please enter a GitHub repository URL in the left panel and click Link to view the project guide.</p>
+      </div>
+      
+      <!-- Full Markdown Overview -->
+      <div class="overview-content markdown-body" id="overview-content" style="display: none; padding: 30px; overflow-y: auto;">
       </div>
 
       <!-- Task detail content -->
@@ -161,10 +209,9 @@
             <span class="badge badge-time" id="detail-time"><i class="fa-regular fa-clock"></i> <span id="detail-time-text">—</span></span>
             <span class="badge badge-diff" id="detail-diff-badge"><i class="fa-solid fa-signal"></i> <span id="detail-diff-text">—</span></span>
           </div>
-<<<<<<< HEAD
           <div class="detail-actions">
-            <button class="btn-youtube-search" onclick="searchCurrentTaskOnYoutube()">
-              <i class="fa-brands fa-youtube"></i> Search YouTube
+            <button class="btn-task-start" id="btn-task-start" onclick="startCurrentTask()" style="background: var(--blue-600); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-family: inherit; margin-right: 8px;">
+              <i class="fa-solid fa-play"></i> Start Task
             </button>
             <button class="btn-task-check" id="btn-task-check" onclick="toggleCurrentTask()">
               <i class="fa-regular fa-circle-check"></i> Mark Complete
@@ -173,7 +220,6 @@
         </div>
         <h2 class="detail-title" id="detail-title"></h2>
         <div class="detail-body markdown-body" id="detail-body"></div>
-        <div class="task-video-section" id="detail-video-section"></div>
       </div>
 
       <!-- Paper detail content -->
@@ -206,14 +252,6 @@
             </div>
           </div>
         </div>
-=======
-          <button class="btn-task-check" id="btn-task-check" onclick="toggleCurrentTask()">
-            <i class="fa-regular fa-circle-check"></i> Mark Complete
-          </button>
-        </div>
-        <h2 class="detail-title" id="detail-title"></h2>
-        <div class="detail-body markdown-body" id="detail-body"></div>
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
       </div>
 
       <!-- Streaming loader (shown during generation) -->
@@ -225,6 +263,6 @@
     </div>
   </section>
 
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=3"></script>
 </body>
 </html>

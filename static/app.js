@@ -12,7 +12,6 @@ const state = {
   tasks:          [],
   completedTasks: new Set(),
   rawMarkdown:    '',
-<<<<<<< HEAD
   previousPage:   'home',
   activeProjectArea: '',
   activeProjectVideos: [],
@@ -20,17 +19,35 @@ const state = {
   activeTab:      'tasks',    // 'tasks' or 'papers'
   papersFilter:   'all',      // 'all' or 'ieee'
   allPapers:      [],
-  ieeePapers:     []
-=======
-  previousPage:   'home'
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
+  ieeePapers:     [],
+  githubRepo:     null,
+  githubCommits:  [],
+  taskStartTimes: {}
 };
 
 // ── Init ───────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  loadProjects();
   marked.setOptions({ breaks: true, gfm: true });
+  
+  const globalRepo = localStorage.getItem('globalGithubRepo');
+  if (!globalRepo) {
+    showPage('setup');
+    document.querySelector('.nav-links').style.display = 'none';
+  } else {
+    document.querySelector('.nav-links').style.display = 'flex';
+    showHome();
+    loadProjects();
+  }
 });
+
+function saveGlobalGithub() {
+  const url = document.getElementById('global-github-input').value.trim();
+  if (!url) return alert("Please enter a GitHub repository URL.");
+  localStorage.setItem('globalGithubRepo', url);
+  document.querySelector('.nav-links').style.display = 'flex';
+  showHome();
+  loadProjects();
+}
 
 // ── Page Navigation ────────────────────────────────────────────
 function showPage(name) {
@@ -100,12 +117,17 @@ function renderProjectsGrid() {
 async function openGuide(slug) {
   state.activeSlug    = slug;
   state.completedTasks = new Set();
-<<<<<<< HEAD
   state.activeTab = 'tasks';
   state.papersFilter = 'all';
   state.allPapers = [];
   state.ieeePapers = [];
+  state.githubRepo = null;
+  state.githubCommits = [];
+  state.taskStartTimes = {};
   
+  document.getElementById('github-unlinked').style.display = 'flex';
+  document.getElementById('github-linked').style.display = 'none';
+
   // Reset tab selection UI
   document.getElementById('tab-tasks').classList.add('active');
   document.getElementById('tab-papers').classList.remove('active');
@@ -114,8 +136,6 @@ async function openGuide(slug) {
   document.getElementById('papers-list').style.display = 'none';
   document.getElementById('paper-detail-content').style.display = 'none';
 
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
   showPage('guide');
   showStreamLoader('Loading guide…');
 
@@ -130,16 +150,32 @@ async function openGuide(slug) {
     document.getElementById('guide-project-name').textContent = project ? project.name : slug;
     document.getElementById('guide-project-date').textContent = project ? formatDate(project.created) : '';
 
-<<<<<<< HEAD
     state.activeProjectArea = data.area || '';
     state.activeProjectVideos = data.videos || [];
     state.activeVideoIdx = 0;
 
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
+    // Fetch GitHub info
+    fetch(`/api/projects/${slug}/github`)
+      .then(r => r.json())
+      .then(ghData => {
+        if (ghData.repo_url) {
+          state.githubRepo = ghData.repo_url;
+          state.githubCommits = ghData.commits || [];
+          document.getElementById('github-unlinked').style.display = 'none';
+          document.getElementById('github-linked').style.display = 'flex';
+          document.getElementById('github-repo-link').href = 'https://github.com/' + state.githubRepo;
+          document.getElementById('github-commits-count').textContent = state.githubCommits.length;
+        }
+        enforceGitHubLink();
+      })
+      .catch(err => {
+        console.error("Error fetching GitHub repo:", err);
+        enforceGitHubLink();
+      });
+
     buildTaskList(data.content);
     hideStreamLoader();
-    showDetailEmpty();
+    enforceGitHubLink();
   } catch (e) {
     hideStreamLoader();
     console.error(e);
@@ -157,22 +193,14 @@ async function startGeneration() {
   state.activeSlug    = null;
   state.tasks         = [];
   state.completedTasks = new Set();
-<<<<<<< HEAD
   state.activeTab = 'tasks';
   state.papersFilter = 'all';
   state.allPapers = [];
   state.ieeePapers = [];
 
   // Reset tab selection UI
-  document.getElementById('tab-tasks').classList.add('active');
-  document.getElementById('tab-papers').classList.remove('active');
-  document.getElementById('task-list').style.display = 'block';
-  document.getElementById('papers-filter-wrap').style.display = 'none';
-  document.getElementById('papers-list').style.display = 'none';
-  document.getElementById('paper-detail-content').style.display = 'none';
+  switchGuideTab('tasks');
 
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
   document.getElementById('guide-project-name').textContent = name;
   document.getElementById('guide-project-date').textContent  = 'Generating…';
   document.getElementById('task-list').innerHTML = '';
@@ -211,8 +239,15 @@ async function startGeneration() {
         try {
           const data = JSON.parse(jsonStr);
           if (data.error) throw new Error(data.error);
+          if (data.reasoning) {
+            // Display reasoning live in the stream text so the user knows it's thinking
+            document.getElementById('stream-text').textContent = 'Thinking... ' + data.reasoning.slice(-100);
+            preview.textContent = (preview.textContent + data.reasoning).slice(-800);
+            preview.scrollTop = preview.scrollHeight;
+          }
           if (data.chunk) {
             fullText += data.chunk;
+            document.getElementById('stream-text').textContent = 'Generating your build guide…';
             preview.textContent = fullText.slice(-800);
             preview.scrollTop   = preview.scrollHeight;
           }
@@ -220,20 +255,56 @@ async function startGeneration() {
             state.activeSlug = data.slug;
             document.getElementById('guide-project-date').textContent = 'Saved just now';
           }
-        } catch (pe) { console.error('Parse error:', pe); }
+        } catch (pe) { 
+          if (pe.message && pe.message.includes('Error code')) {
+            throw pe;
+          } else if (pe.message === jsonStr || jsonStr.includes('error')) {
+              throw pe;
+          }
+          console.error('Parse error:', pe); 
+        }
       }
     }
 
     state.rawMarkdown = fullText;
-<<<<<<< HEAD
     
     if (state.activeSlug) {
+      const globalRepo = localStorage.getItem('globalGithubRepo');
+      if (globalRepo) {
+        // Automatically link the global repo to this new project
+        try {
+          await fetch(`/api/projects/${state.activeSlug}/github`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ repo_url: globalRepo })
+          });
+        } catch(e) {
+          console.error("Failed to auto-link github repo", e);
+        }
+      }
+
       try {
         const res = await fetch(`/api/projects/${state.activeSlug}`);
         const data = await res.json();
         state.activeProjectArea = data.area || '';
         state.activeProjectVideos = data.videos || [];
         state.activeVideoIdx = 0;
+        
+        // Re-fetch GitHub info after auto-linking
+        try {
+          const ghRes = await fetch(`/api/projects/${state.activeSlug}/github`);
+          const ghData = await ghRes.json();
+          if (ghData.repo_url) {
+            state.githubRepo = ghData.repo_url;
+            state.githubCommits = ghData.commits || [];
+            document.getElementById('github-unlinked').style.display = 'none';
+            document.getElementById('github-linked').style.display = 'flex';
+            document.getElementById('github-repo-link').href = 'https://github.com/' + state.githubRepo;
+            document.getElementById('github-commits-count').textContent = state.githubCommits.length;
+          }
+        } catch(e) {
+          console.error(e);
+        }
       } catch (err) {
         console.error('Failed to load generated project details:', err);
       }
@@ -243,10 +314,9 @@ async function startGeneration() {
       state.activeVideoIdx = 0;
     }
 
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
     buildTaskList(fullText);
     hideStreamLoader();
+    enforceGitHubLink();
     await loadProjects();
 
   } catch (e) {
@@ -423,10 +493,6 @@ function selectTask(idx) {
   if (task.body && task.body.trim().length > 0) {
     bodyEl.innerHTML = marked.parse(task.body);
   } else {
-<<<<<<< HEAD
-=======
-    // Fallback: construct a meaningful placeholder from the title itself
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
     bodyEl.innerHTML = `
       <p>This step focuses on: <strong>${escHtml(task.title)}</strong>.</p>
       <p>Follow the phase instructions above and refer to sections 7 and 8 of your guide (Core Logic Explained and Testing Strategy) for deeper context on this step.</p>
@@ -434,42 +500,140 @@ function selectTask(idx) {
       ${task.difficulty ? `<p><strong>Complexity level:</strong> ${escHtml(task.difficulty)}.</p>` : ''}`;
   }
 
-  // Mark-complete button
+  // Start vs Complete buttons
+  const startBtn = document.getElementById('btn-task-start');
   const checkBtn = document.getElementById('btn-task-check');
+  
   if (state.completedTasks.has(idx)) {
+    startBtn.style.display = 'none';
+    checkBtn.style.display = 'inline-flex';
     checkBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Completed';
     checkBtn.classList.add('done');
-  } else {
-    checkBtn.innerHTML = '<i class="fa-regular fa-circle-check"></i> Mark Complete';
+  } else if (state.taskStartTimes[idx]) {
+    startBtn.style.display = 'none';
+    checkBtn.style.display = 'inline-flex';
+    checkBtn.innerHTML = '<i class="fa-regular fa-circle-check"></i> Verify & Complete';
     checkBtn.classList.remove('done');
+  } else {
+    startBtn.style.display = 'inline-flex';
+    checkBtn.style.display = 'none';
   }
+  startBtn.dataset.taskIdx = idx;
   checkBtn.dataset.taskIdx = idx;
 
   // Show detail panel
   document.getElementById('detail-empty').style.display   = 'none';
   document.getElementById('stream-loader').style.display  = 'none';
   document.getElementById('detail-content').style.display = 'flex';
-<<<<<<< HEAD
-
-  renderVideoSection();
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 }
 
-// ── Toggle Task Completion ─────────────────────────────────────
-function toggleCurrentTask() {
+// ── Task State Logic ──────────────────────────────────────────
+async function editGitHubUrl() {
+  const currentUrl = localStorage.getItem('globalGithubRepo') || '';
+  const newUrl = prompt("Enter your GitHub repository URL (e.g. owner/repo):", currentUrl);
+  if (newUrl !== null) {
+    const cleanUrl = newUrl.trim();
+    if (!cleanUrl) return alert("URL cannot be empty.");
+    localStorage.setItem('globalGithubRepo', cleanUrl);
+    
+    // If a project is open, update its linked repo immediately
+    if (state.activeSlug) {
+      await linkRepo(cleanUrl);
+    } else {
+      alert("Global GitHub repository updated successfully.");
+    }
+  }
+}
+
+async function linkGitHubRepo() {
+  const url = document.getElementById('github-repo-input').value.trim();
+  await linkRepo(url);
+}
+
+async function linkGitHubRepoOverlay() {
+  const url = document.getElementById('github-overlay-input').value.trim();
+  await linkRepo(url);
+}
+
+async function linkRepo(url) {
+  if (!url) return alert("Please enter a GitHub URL.");
+  if (!state.activeSlug) return;
+  
+  try {
+    const res = await fetch(`/api/projects/${state.activeSlug}/github`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ repo_url: url })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    
+    // Re-fetch to update commits
+    openGuide(state.activeSlug);
+  } catch (err) {
+    alert("Failed to link repo: " + err.message);
+  }
+}
+
+function startCurrentTask() {
+  const btn = document.getElementById('btn-task-start');
+  const idx = Number(btn.dataset.taskIdx);
+  if (isNaN(idx)) return;
+  
+  state.taskStartTimes[idx] = Date.now();
+  selectTask(idx);
+}
+
+async function toggleCurrentTask() {
   const btn = document.getElementById('btn-task-check');
   const idx = Number(btn.dataset.taskIdx);
   if (isNaN(idx)) return;
 
   if (state.completedTasks.has(idx)) {
+    // Un-complete
     state.completedTasks.delete(idx);
-    btn.innerHTML = '<i class="fa-regular fa-circle-check"></i> Mark Complete';
-    btn.classList.remove('done');
+    selectTask(idx);
   } else {
+    // Verify & Complete
+    if (state.githubRepo) {
+      const startTime = state.taskStartTimes[idx];
+      if (!startTime) return alert("You must start the task first.");
+      
+      const oneMinuteInMs = 60000;
+      if (Date.now() - startTime < oneMinuteInMs) {
+        return alert("You must spend at least 1 minute on this task before completing it.");
+      }
+      
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+      try {
+        const res = await fetch(`/api/projects/${state.activeSlug}/github`);
+        const ghData = await res.json();
+        const latestCommits = ghData.commits || [];
+        
+        let foundValidCommit = false;
+        for (const c of latestCommits) {
+          const cTime = new Date(c.date).getTime();
+          // We check if there's a commit strictly after the task start time.
+          if (cTime >= startTime) {
+            foundValidCommit = true;
+            break;
+          }
+        }
+        
+        if (!foundValidCommit) {
+          btn.innerHTML = '<i class="fa-regular fa-circle-check"></i> Verify & Complete';
+          return alert("No new commits found since you started this task! Please push your code to the linked GitHub repository.");
+        }
+        state.githubCommits = latestCommits;
+        document.getElementById('github-commits-count').textContent = state.githubCommits.length;
+      } catch (err) {
+        btn.innerHTML = '<i class="fa-regular fa-circle-check"></i> Verify & Complete';
+        return alert("Failed to verify commits: " + err.message);
+      }
+    }
+    
     state.completedTasks.add(idx);
-    btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Completed';
-    btn.classList.add('done');
+    selectTask(idx);
   }
 
   document.querySelectorAll('.task-item').forEach(el => {
@@ -489,25 +653,74 @@ function updateProgress() {
   document.getElementById('progress-label').textContent = `${done} of ${total} tasks completed`;
 }
 
-<<<<<<< HEAD
-// ── Tabs Switching (Tasks vs Papers) ───────────────────────────
+// ── Enforce GitHub Link ─────────────────────────────────────────
+function enforceGitHubLink() {
+  const isLinked = !!state.githubRepo;
+  const overlay = document.getElementById('github-overlay');
+  const taskPanel = document.querySelector('.task-panel');
+  const detailPanel = document.getElementById('detail-panel');
+  
+  if (!isLinked) {
+    if (overlay) overlay.style.display = 'flex';
+    if (taskPanel) taskPanel.style.display = 'none';
+    if (detailPanel) detailPanel.style.display = 'none';
+  } else {
+    if (overlay) overlay.style.display = 'none';
+    if (taskPanel) taskPanel.style.display = 'flex';
+    if (detailPanel) detailPanel.style.display = 'flex';
+    
+    // Re-initialize correct tab
+    switchGuideTab(state.activeTab);
+  }
+}
+
+// ── Tabs Switching (Overview, Tasks vs Papers) ───────────────────────────
 function switchGuideTab(tabName) {
+  if (!state.githubRepo) return; // Prevent switching if not linked
+
   state.activeTab = tabName;
   
+  const tabOverview = document.getElementById('tab-overview');
   const tabTasks = document.getElementById('tab-tasks');
   const tabPapers = document.getElementById('tab-papers');
+  
+  const overviewListWrap = document.getElementById('overview-list-wrap');
   const taskList = document.getElementById('task-list');
   const papersFilterWrap = document.getElementById('papers-filter-wrap');
   const papersList = document.getElementById('papers-list');
   
-  if (tabName === 'tasks') {
+  const detailEmpty = document.getElementById('detail-empty');
+  const detailContent = document.getElementById('detail-content');
+  const paperDetailContent = document.getElementById('paper-detail-content');
+  const overviewContent = document.getElementById('overview-content');
+
+  // Reset all tabs
+  if(tabOverview) tabOverview.classList.remove('active');
+  tabTasks.classList.remove('active');
+  tabPapers.classList.remove('active');
+  
+  if (overviewListWrap) overviewListWrap.style.display = 'none';
+  taskList.style.display = 'none';
+  papersFilterWrap.style.display = 'none';
+  papersList.style.display = 'none';
+  
+  detailEmpty.style.display = 'none';
+  detailContent.style.display = 'none';
+  paperDetailContent.style.display = 'none';
+  if (overviewContent) overviewContent.style.display = 'none';
+  const ghReqEmpty = document.getElementById('github-required-empty');
+  if (ghReqEmpty) ghReqEmpty.style.display = 'none';
+
+  if (tabName === 'overview') {
+    if(tabOverview) tabOverview.classList.add('active');
+    if(overviewListWrap) overviewListWrap.style.display = 'block';
+    if(overviewContent) {
+        overviewContent.style.display = 'block';
+        overviewContent.innerHTML = marked.parse(state.rawMarkdown || 'No content generated yet.');
+    }
+  } else if (tabName === 'tasks') {
     tabTasks.classList.add('active');
-    tabPapers.classList.remove('active');
     taskList.style.display = 'block';
-    papersFilterWrap.style.display = 'none';
-    papersList.style.display = 'none';
-    
-    document.getElementById('paper-detail-content').style.display = 'none';
     
     const activeItem = document.querySelector('.task-item.active:not(.paper-item)');
     if (activeItem) {
@@ -519,7 +732,6 @@ function switchGuideTab(tabName) {
       showDetailEmpty();
     }
   } else {
-    tabTasks.classList.remove('active');
     tabPapers.classList.add('active');
     taskList.style.display = 'none';
     papersFilterWrap.style.display = 'block';
@@ -645,18 +857,13 @@ function selectPaper(idx) {
   document.getElementById('paper-detail-content').style.display = 'flex';
 }
 
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 // ── Stream Loader Helpers ──────────────────────────────────────
 function showStreamLoader(msg) {
   document.getElementById('stream-text').textContent      = msg;
   document.getElementById('stream-loader').style.display  = 'flex';
   document.getElementById('detail-empty').style.display   = 'none';
   document.getElementById('detail-content').style.display = 'none';
-<<<<<<< HEAD
   document.getElementById('paper-detail-content').style.display = 'none';
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 }
 function hideStreamLoader() {
   document.getElementById('stream-loader').style.display = 'none';
@@ -664,9 +871,10 @@ function hideStreamLoader() {
 function showDetailEmpty() {
   document.getElementById('detail-empty').style.display   = 'flex';
   document.getElementById('detail-content').style.display = 'none';
-<<<<<<< HEAD
   document.getElementById('paper-detail-content').style.display = 'none';
   document.getElementById('stream-loader').style.display  = 'none';
+  const ghReqEmpty = document.getElementById('github-required-empty');
+  if (ghReqEmpty) ghReqEmpty.style.display = 'none';
   
   if (state.activeTab === 'papers') {
     document.getElementById('empty-title').textContent = 'Select a paper to view details';
@@ -678,11 +886,6 @@ function showDetailEmpty() {
 }
 
 
-=======
-  document.getElementById('stream-loader').style.display  = 'none';
-}
-
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 // ── Export Markdown ────────────────────────────────────────────
 async function exportGuide() {
   if (!state.activeSlug) return;
@@ -715,128 +918,3 @@ function formatDate(ts) {
   if (!ts || ts.length < 8) return '';
   return `${ts.slice(6, 8)}/${ts.slice(4, 6)}/${ts.slice(0, 4)}`;
 }
-<<<<<<< HEAD
-
-// ── YouTube Video Player Integration ───────────────────────────
-function renderVideoSection() {
-  const container = document.getElementById('detail-video-section');
-  if (!container) return;
-
-  const videos = state.activeProjectVideos || [];
-  if (videos.length === 0) {
-    container.style.display = 'none';
-    container.innerHTML = '';
-    return;
-  }
-
-  container.style.display = 'block';
-
-  // Ensure active index is within bounds
-  if (state.activeVideoIdx >= videos.length) {
-    state.activeVideoIdx = 0;
-  }
-
-  const currentVideo = videos[state.activeVideoIdx];
-  const embedUrl = getEmbedUrl(currentVideo.link);
-
-  let tabsHtml = '';
-  if (videos.length > 1) {
-    tabsHtml = `
-      <div class="video-tabs-container">
-        <span class="video-tabs-label"><i class="fa-solid fa-list-ul"></i> Choose Tutorial Topic:</span>
-        <div class="video-tabs">
-          ${videos.map((vid, idx) => {
-            const isActive = idx === state.activeVideoIdx;
-            const label = vid.details || `Video ${idx + 1}`;
-            return `
-              <button class="video-tab-btn ${isActive ? 'active' : ''}" onclick="switchVideo(${idx})">
-                <i class="fa-solid ${isActive ? 'fa-play' : 'fa-film'}"></i>
-                <span>${escHtml(label)}</span>
-              </button>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    `;
-  }
-
-  const areaBadgeText = state.activeProjectArea ? escHtml(state.activeProjectArea) : 'Reference Materials';
-
-  container.innerHTML = `
-    <div class="video-player-widget">
-      <div class="video-widget-header">
-        <div class="video-widget-title-wrap">
-          <span class="video-widget-subtitle"><i class="fa-solid fa-graduation-cap"></i> Recommended Domain</span>
-          <h4 class="video-widget-title">${areaBadgeText}</h4>
-        </div>
-        <button class="btn-youtube-search-widget" onclick="searchCurrentTaskOnYoutube()">
-          <i class="fa-brands fa-youtube"></i> Search YouTube
-        </button>
-      </div>
-      
-      ${tabsHtml}
-      
-      <div class="video-player-container">
-        ${embedUrl ? `
-          <iframe 
-            src="${embedUrl}" 
-            title="Project Tutorial Video" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            allowfullscreen>
-          </iframe>
-        ` : `
-          <div class="video-player-error">
-            <i class="fa-solid fa-circle-exclamation"></i>
-            <p>Invalid video link: <a href="${escHtml(currentVideo.link)}" target="_blank">${escHtml(currentVideo.link)}</a></p>
-          </div>
-        `}
-      </div>
-    </div>
-  `;
-}
-
-function switchVideo(idx) {
-  state.activeVideoIdx = idx;
-  renderVideoSection();
-}
-
-function searchCurrentTaskOnYoutube() {
-  const checkBtn = document.getElementById('btn-task-check');
-  if (!checkBtn) return;
-  const idx = Number(checkBtn.dataset.taskIdx);
-  const task = state.tasks[idx];
-  if (!task) return;
-
-  const projectName = document.getElementById('guide-project-name').textContent || '';
-  const query = `${projectName} ${task.title}`;
-  const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-  window.open(url, '_blank');
-}
-
-function getEmbedUrl(url) {
-  if (!url) return '';
-  // Check playlist
-  const playlistMatch = url.match(/[?&]list=([^#\&\?]+)/);
-  if (playlistMatch) {
-    return `https://www.youtube.com/embed/videoseries?list=${playlistMatch[1]}`;
-  }
-  // Check short url youtu.be
-  const shortMatch = url.match(/youtu\.be\/([^#\&\?]+)/);
-  if (shortMatch) {
-    return `https://www.youtube.com/embed/${shortMatch[1]}`;
-  }
-  // Check standard watch v=
-  const watchMatch = url.match(/[?&]v=([^#\&\?]+)/);
-  if (watchMatch) {
-    return `https://www.youtube.com/embed/${watchMatch[1]}`;
-  }
-  // Check embed url already
-  const embedMatch = url.match(/youtube\.com\/embed\/([^#\&\?]+)/);
-  if (embedMatch) {
-    return url;
-  }
-  return '';
-}
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082

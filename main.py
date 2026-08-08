@@ -28,13 +28,10 @@ from pathlib import Path
 import time
 import webbrowser
 import threading
-<<<<<<< HEAD
 import csv
 from flask import Flask, render_template, request, jsonify, Response
 import scraper
-=======
-from flask import Flask, render_template, request, jsonify, Response
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
+import github
 
 try:
     from openai import OpenAI
@@ -57,9 +54,8 @@ except ImportError:
 # ---------------------------------------------------------------------------
 
 BASE_URL = "https://integrate.api.nvidia.com/v1"
-# Browse more free models at https://build.nvidia.com/models and swap this.
-MODEL = "meta/llama-3.1-8b-instruct"
-MAX_TOKENS = 4096
+MODEL = "nvidia/nemotron-3-super-120b-a12b"
+MAX_TOKENS = 16384
 
 PROJECTS_DIR = Path(__file__).resolve().parent / "projects"
 INDEX_FILE = PROJECTS_DIR / "index.json"
@@ -75,11 +71,8 @@ NON-NEGOTIABLE RULES — apply to the entire document:
 1. Every step in Section 6 must be written in FULL detail using the exact 5-part structure defined below (title, paragraph, sub-actions, time, complexity). A single sentence or one-line summary for a step is a failure — this applies to every step in every phase, from the first step to the very last one. Do not shorten, compress, or summarize steps later in the document even if the guide is getting long.
 2. Every fact, command, tool name, library, or instruction must be technically accurate and something that actually works in real-world development. Never invent a command, flag, library, or step just to fill space. If you are not fully certain of an exact command or syntax, describe the goal and general approach in plain language instead of fabricating specific syntax.
 3. Do not skip, merge, or abbreviate any of the 12 sections below.
-<<<<<<< HEAD
 4. For large, complex, or hard projects, you must scale the build guide accordingly. Do not write a simple minimal set of tasks. Break down the project into a comprehensive list of 10 to 20 individual steps, ordered chronologically. Every phase must contain all intermediate steps (such as environment bootstrap, schema designs, helper creation, component builds, state integration, testing, etc.) without skipping, combining, or glossing over them.
 5. In Section 6 (Step-by-Step Build Guide), focus heavily on the logic, execution, code setup, coding steps, testing, and practical implementation details of the task itself. Do NOT focus on explaining or describing the project folder structure or file layout details in Section 6, as the folder structure is already fully covered in Section 5.
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 
 Given a project abstract, produce a thorough Markdown document with these exact sections, in this order:
 
@@ -146,14 +139,11 @@ Mistakes beginners make on this kind of project, and how to avoid or fix them.
 ## 12. Suggested Timeline
 A milestone breakdown (e.g. Week 1, Week 2...) sized to the project's apparent complexity, consistent with the per-step time estimates in Section 6.
 
-Be specific to the abstract given — avoid generic advice that could apply to any project. Assume the reader can code but has not built this exact kind of project before. Use proper Markdown headers and bullet points throughout. Do not use code blocks anywhere in the document."""
+Be specific to the abstract given — avoid generic advice that could apply to any project. Assume the reader can code but has not built this exact kind of project before. Use proper Markdown headers and bullet points throughout. Do not use code blocks anywhere in the document, EXCEPT for Section 4 (System Architecture) and Section 5 (Project Folder Structure) where code blocks are strictly required."""
 
-<<<<<<< HEAD
 FOLLOWUP_SYSTEM_PROMPT = """You are an expert software architect and mentor. The user has generated a project build guide and is asking follow-up questions about it.
 Answer their questions accurately, clearly, and constructively, focusing on helping them implement the project steps. Keep your answers detailed and practical, but do not use code blocks unless specifically requested. Use markdown styling."""
 
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 
 # ---------------------------------------------------------------------------
 # NVIDIA NIM API (OpenAI-compatible)
@@ -161,10 +151,9 @@ Answer their questions accurately, clearly, and constructively, focusing on help
 
 def get_client() -> OpenAI:
     """Build an OpenAI-compatible client pointed at NVIDIA NIM."""
-    api_key = os.environ.get("NVIDIA_API_KEY", "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")
+    api_key = os.environ.get("NVIDIA_API_KEY")
     if not api_key:
-        print("NVIDIA_API_KEY is not set in your environment.")
-        api_key = input("Paste your NVIDIA API key (starts with nvapi-): ").strip()
+        raise ValueError("NVIDIA_API_KEY environment variable is not set. Please set it in your Vercel deployment settings.")
     return OpenAI(base_url=BASE_URL, api_key=api_key)
 
 
@@ -174,20 +163,25 @@ def _stream_chat(client: OpenAI, system_prompt: str, messages: list, on_chunk=No
     stream = client.chat.completions.create(
         model=MODEL,
         messages=[{"role": "system", "content": system_prompt}, *messages],
+        temperature=1,
+        top_p=0.95,
         max_tokens=MAX_TOKENS,
-        temperature=0.4,
-        top_p=0.9,
+        extra_body={"chat_template_kwargs":{"enable_thinking":True},"reasoning_budget":16384},
         stream=True,
     )
     for chunk in stream:
         if not chunk.choices:
             continue
         delta = chunk.choices[0].delta
+        reasoning = getattr(delta, "reasoning_content", None)
+        if reasoning:
+            if on_chunk:
+                on_chunk(reasoning, is_reasoning=True)
         content = getattr(delta, "content", None)
         if content:
             full_text.append(content)
             if on_chunk:
-                on_chunk(content)
+                on_chunk(content, is_reasoning=False)
     return "".join(full_text)
 
 
@@ -204,7 +198,6 @@ def ask_followup(client: OpenAI, history: list, question: str, on_chunk=None) ->
 
 
 # ---------------------------------------------------------------------------
-<<<<<<< HEAD
 # YouTube Dataset & Classification
 # ---------------------------------------------------------------------------
 
@@ -329,8 +322,6 @@ Example query: "hand gesture recognition deaf communication"
 
 
 # ---------------------------------------------------------------------------
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
 # Storage — save/load guides as Markdown, tracked in a JSON index
 # ---------------------------------------------------------------------------
 
@@ -365,7 +356,6 @@ def save_project(name: str, abstract: str, guide_markdown: str) -> Path:
     filepath.write_text(header + guide_markdown, encoding="utf-8")
 
     index = _load_index()
-<<<<<<< HEAD
     
     # Classify the project domain using YouTube dataset areas
     youtube_data = load_youtube_dataset()
@@ -385,18 +375,13 @@ def save_project(name: str, abstract: str, guide_markdown: str) -> Path:
     except Exception as e:
         print(f"Error running paper scraper during project save: {e}")
 
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
     index.append({
         "name": name,
         "slug": slug,
         "file": filepath.name,
         "abstract": abstract,
         "created": timestamp,
-<<<<<<< HEAD
         "area": area
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
     })
     _save_index(index)
     return filepath
@@ -535,7 +520,19 @@ def followup_flow(client: OpenAI):
 
 
 # Flask App Setup
-app = Flask(__name__, template_folder='templates', static_folder='static')
+app = Flask(__name__)
+
+# Serve static assets and templates locally (Vercel will also use these)
+app.static_folder = 'static'
+app.template_folder = 'templates'
+
+# Configure storage directory (Use /tmp for serverless Vercel, else local)
+if os.environ.get("VERCEL") == "1":
+    DATA_DIR = "/tmp/projects"
+else:
+    DATA_DIR = "projects"
+    
+os.makedirs(DATA_DIR, exist_ok=True)
 
 @app.route('/')
 def home():
@@ -552,7 +549,6 @@ def api_projects():
 def api_get_project(slug):
     try:
         content = load_project(slug)
-<<<<<<< HEAD
         projects = _load_index()
         project = next((p for p in projects if p['slug'] == slug), None)
         
@@ -631,9 +627,51 @@ def api_get_project_papers(slug):
             'all_papers': all_papers,
             'ieee_papers': ieee_papers
         })
-=======
-        return jsonify({'content': content})
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/projects/<slug>/github', methods=['POST'])
+def api_set_github(slug):
+    try:
+        data = request.json or {}
+        repo_url = data.get('repo_url', '').strip()
+        if not repo_url:
+            return jsonify({'error': 'No repo_url provided'}), 400
+        
+        projects = _load_index()
+        project = next((p for p in projects if p['slug'] == slug), None)
+        if not project:
+            return jsonify({'error': 'Project not found'}), 404
+        
+        # Validate repo URL format using github.py
+        github.parse_repo_url(repo_url)
+        
+        project['github_repo'] = repo_url
+        _save_index(projects)
+        return jsonify({'success': True, 'repo_url': repo_url})
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/projects/<slug>/github', methods=['GET'])
+def api_get_github(slug):
+    try:
+        projects = _load_index()
+        project = next((p for p in projects if p['slug'] == slug), None)
+        if not project:
+            return jsonify({'error': 'Project not found'}), 404
+        
+        repo_url = project.get('github_repo')
+        if not repo_url:
+            return jsonify({'repo_url': None, 'commits': []})
+        
+        try:
+            commits = github.fetch_commits(repo_url)
+            return jsonify({'repo_url': repo_url, 'commits': commits})
+        except Exception as e:
+            # If fetching fails (e.g. rate limit), still return the repo URL but with an error
+            return jsonify({'repo_url': repo_url, 'commits': [], 'fetch_error': str(e)})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -649,24 +687,30 @@ def api_generate():
         client = get_client()
         full_text = []
         try:
+            yield f"data: {json.dumps({'chunk': 'Initializing AI Mentor...\\n'})}\n\n"
             messages = [{"role": "user", "content": f"Project abstract:\n\n{abstract}"}]
             stream = client.chat.completions.create(
                 model=MODEL,
                 messages=[{"role": "system", "content": SYSTEM_PROMPT}, *messages],
+                temperature=1,
+                top_p=0.95,
                 max_tokens=MAX_TOKENS,
-                temperature=0.4,
-                top_p=0.9,
+                extra_body={"chat_template_kwargs":{"enable_thinking":True},"reasoning_budget":16384},
                 stream=True,
             )
             for chunk in stream:
                 if not chunk.choices:
                     continue
                 delta = chunk.choices[0].delta
+                reasoning = getattr(delta, "reasoning_content", None)
+                if reasoning:
+                    yield f"data: {json.dumps({'reasoning': reasoning})}\n\n"
                 content = getattr(delta, "content", None)
                 if content:
                     full_text.append(content)
                     yield f"data: {json.dumps({'chunk': content})}\n\n"
             
+            yield f"data: {json.dumps({'chunk': '\\n\\n*Retrieving academic papers. This may take a moment...*\\n'})}\n\n"
             guide = "".join(full_text)
             filepath = save_project(name, abstract, guide)
             yield f"data: {json.dumps({'done': True, 'slug': filepath.stem})}\n\n"
@@ -703,15 +747,19 @@ def api_followup():
                 stream = client.chat.completions.create(
                     model=MODEL,
                     messages=[{"role": "system", "content": FOLLOWUP_SYSTEM_PROMPT}, *messages],
+                    temperature=1,
+                    top_p=0.95,
                     max_tokens=MAX_TOKENS,
-                    temperature=0.4,
-                    top_p=0.9,
+                    extra_body={"chat_template_kwargs":{"enable_thinking":True},"reasoning_budget":16384},
                     stream=True,
                 )
                 for chunk in stream:
                     if not chunk.choices:
                         continue
                     delta = chunk.choices[0].delta
+                    reasoning = getattr(delta, "reasoning_content", None)
+                    if reasoning:
+                        yield f"data: {json.dumps({'reasoning': reasoning})}\n\n"
                     content = getattr(delta, "content", None)
                     if content:
                         full_text.append(content)

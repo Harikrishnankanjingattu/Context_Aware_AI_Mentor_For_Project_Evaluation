@@ -1,32 +1,32 @@
 /* =====================================================
-   LUCA — Premium White UI with Glossy Dark Blue Buttons
+   LUCA — Premium Glassmorphism Teal Theme
    ===================================================== */
 
 /* ---------- CSS Variables ---------- */
 :root {
   /* Colors */
   --white: #ffffff;
-  --off-white: #f8f9fc;
-  --surface: #f1f4f9;
-  --surface-hover: #eaeff7;
-  --border: #dde3ee;
-  --border-strong: #c5cfe0;
+  --off-white: rgba(255, 255, 255, 0.4);
+  --surface: rgba(255, 255, 255, 0.65);
+  --surface-hover: rgba(255, 255, 255, 0.85);
+  --border: rgba(15, 118, 110, 0.15);
+  --border-strong: rgba(15, 118, 110, 0.3);
 
-  /* Blue Palette */
-  --blue-900: #0f1e40;
-  --blue-800: #162a56;
-  --blue-700: #1e3a72;
-  --blue-600: #244590;
-  --blue-500: #2b52ae;
-  --blue-400: #3a65c9;
-  --blue-300: #6089d8;
-  --blue-100: #dde8f8;
-  --blue-50:  #eef4ff;
+  /* Teal Palette */
+  --blue-900: #042f2e;
+  --blue-800: #115e59;
+  --blue-700: #0f766e;
+  --blue-600: #0d9488;
+  --blue-500: #14b8a6;
+  --blue-400: #2dd4bf;
+  --blue-300: #5eead4;
+  --blue-100: #ccfbf1;
+  --blue-50:  #f0fdfa;
 
   /* Text */
-  --text-primary:   #0d1526;
-  --text-secondary: #4a5568;
-  --text-muted:     #8595ae;
+  --text-primary:   #042f2e;
+  --text-secondary: #115e59;
+  --text-muted:     #5eead4;
   --text-on-blue:   #ffffff;
 
   /* Status */
@@ -35,16 +35,16 @@
   --red:    #dc2626;
 
   /* Shadows */
-  --shadow-xs:   0 1px 2px rgba(15, 30, 64, 0.06);
-  --shadow-sm:   0 2px 6px rgba(15, 30, 64, 0.08);
-  --shadow-md:   0 4px 16px rgba(15, 30, 64, 0.10);
-  --shadow-lg:   0 8px 32px rgba(15, 30, 64, 0.14);
-  --shadow-blue: 0 4px 20px rgba(43, 82, 174, 0.30);
+  --shadow-xs:   0 1px 2px rgba(4, 47, 46, 0.04);
+  --shadow-sm:   0 4px 12px rgba(4, 47, 46, 0.06);
+  --shadow-md:   0 8px 24px rgba(4, 47, 46, 0.08);
+  --shadow-lg:   0 12px 32px rgba(4, 47, 46, 0.12);
+  --shadow-blue: 0 8px 24px rgba(13, 148, 136, 0.25);
 
   /* Glossy gradient buttons */
-  --btn-grad: linear-gradient(160deg, #3a65c9 0%, #1e3a72 60%, #162a56 100%);
-  --btn-grad-hover: linear-gradient(160deg, #4a75d9 0%, #2a4a82 60%, #1e3a72 100%);
-  --btn-shine: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 50%);
+  --btn-grad: linear-gradient(135deg, #14b8a6 0%, #0d9488 50%, #0f766e 100%);
+  --btn-grad-hover: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 50%, #0d9488 100%);
+  --btn-shine: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 50%);
 
   /* Transitions */
   --t: 0.22s cubic-bezier(.4,0,.2,1);
@@ -67,7 +67,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; width: 100%; overflow: hidden; }
 body {
-  background: var(--white);
+  background: linear-gradient(135deg, #ffffff 0%, #ccfbf1 50%, #f0fdfa 100%);
   color: var(--text-primary);
   font-family: var(--font-body);
   font-size: 15px;
@@ -92,14 +92,16 @@ textarea { resize: none; }
   position: fixed;
   top: 0; left: 0; right: 0;
   height: var(--nav-h);
-  background: var(--white);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 28px;
   z-index: 100;
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-sm);
 }
 
 .nav-brand {
@@ -202,7 +204,7 @@ textarea { resize: none; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--white);
+  background: transparent;
   overflow-y: auto;
   padding: 40px 24px;
 }
@@ -237,8 +239,10 @@ textarea { resize: none; }
 /* ASK BOX */
 .ask-box {
   width: 100%;
-  background: var(--white);
-  border: 1.5px solid var(--border-strong);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-xl);
   padding: 20px;
   display: flex;
@@ -317,7 +321,7 @@ textarea { resize: none; }
    ===================================================== */
 #page-projects {
   flex-direction: column;
-  background: var(--off-white);
+  background: transparent;
   overflow-y: auto;
   padding: 40px 48px;
   gap: 28px;
@@ -343,13 +347,15 @@ textarea { resize: none; }
 }
 
 .project-card {
-  background: var(--white);
-  border: 1.5px solid var(--border);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 22px;
   cursor: pointer;
-  transition: var(--t);
-  box-shadow: var(--shadow-xs);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -407,7 +413,7 @@ textarea { resize: none; }
    ===================================================== */
 #page-guide {
   flex-direction: row;
-  background: var(--white);
+  background: transparent;
   overflow: hidden;
 }
 
@@ -415,8 +421,10 @@ textarea { resize: none; }
 .task-panel {
   width: var(--task-panel-w);
   min-width: var(--task-panel-w);
-  background: var(--white);
-  border-right: 1.5px solid var(--border);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -512,6 +520,7 @@ textarea { resize: none; }
 /* Task List */
 .task-list {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 8px 10px 16px;
   display: flex;
@@ -525,14 +534,17 @@ textarea { resize: none; }
   gap: 10px;
   padding: 12px 12px;
   border-radius: var(--radius-md);
-  border: 1.5px solid transparent;
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: var(--t);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  background: rgba(255, 255, 255, 0.3);
 }
 .task-item:hover {
-  background: var(--surface);
+  background: rgba(255, 255, 255, 0.8);
   border-color: var(--border);
+  transform: translateX(4px);
+  box-shadow: var(--shadow-sm);
 }
 .task-item.active {
   background: var(--blue-50);
@@ -612,7 +624,9 @@ textarea { resize: none; }
 /* --- Detail Panel (Right) --- */
 .detail-panel {
   flex: 1;
-  background: var(--off-white);
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   height: 100%;
   overflow: hidden;
   display: flex;
@@ -704,7 +718,7 @@ textarea { resize: none; }
   box-shadow: var(--shadow-blue);
   position: relative;
   overflow: hidden;
-  transition: var(--t);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .btn-task-check::after {
   content: '';
@@ -712,7 +726,11 @@ textarea { resize: none; }
   inset: 0;
   background: var(--btn-shine);
 }
-.btn-task-check:hover { filter: brightness(1.12); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(43,82,174,.35); }
+.btn-task-check:hover { 
+  filter: brightness(1.12); 
+  transform: translateY(-2px) scale(1.02); 
+  box-shadow: 0 8px 25px rgba(13, 148, 136, 0.4); 
+}
 .btn-task-check.done { background: linear-gradient(160deg, #059669, #065f46); box-shadow: 0 4px 20px rgba(5,150,105,.3); }
 
 .detail-title {
@@ -876,7 +894,6 @@ textarea { resize: none; }
 }
 .no-projects i { font-size: 2.5rem; margin-bottom: 16px; display: block; color: var(--border-strong); }
 .no-projects h3 { font-family: var(--font-head); font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 6px; }
-<<<<<<< HEAD
 
 /* =====================================================
    YOUTUBE VIDEO PLAYER INTEGRATION & SEARCH (PREMIUM UI)
@@ -1267,5 +1284,54 @@ textarea { resize: none; }
   color: var(--text-primary);
   line-height: 1.5;
 }
-=======
->>>>>>> 8ba20ef3734c5c876a1c63a3896609a88770e082
+
+/* =====================================================
+   MOBILE RESPONSIVENESS
+   ===================================================== */
+@media (max-width: 768px) {
+  /* Navbar */
+  .navbar {
+    padding: 0 15px;
+  }
+  .nav-btn {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+  .nav-btn span, .nav-btn i + span {
+    display: none; /* Hide text on small screens, show icons */
+  }
+
+  /* Guide Workspace */
+  #page-guide {
+    flex-direction: column;
+    overflow-y: auto; /* Allow entire page to scroll if needed on mobile */
+  }
+
+  .task-panel {
+    width: 100%;
+    min-width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    height: 40vh; /* Task list takes top 40% */
+  }
+
+  .detail-panel {
+    height: 60vh; /* Detail panel takes bottom 60% */
+  }
+
+  /* Projects Grid */
+  #page-projects {
+    padding: 20px;
+  }
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Ask Box / Home */
+  .hero-title {
+    font-size: 1.8rem;
+  }
+  .examples-grid {
+    grid-template-columns: 1fr;
+  }
+}
