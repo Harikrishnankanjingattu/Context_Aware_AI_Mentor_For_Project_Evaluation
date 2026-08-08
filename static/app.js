@@ -198,10 +198,22 @@ async function openGuide(slug) {
 
 // ── Generate New Guide ─────────────────────────────────────────
 async function startGeneration() {
-  const name     = document.getElementById('input-name').value.trim();
+  let name = document.getElementById('input-name').value.trim();
   const abstract = document.getElementById('input-abstract').value.trim();
-  if (!name)     { alert('Please enter a project name.'); return; }
-  if (!abstract) { alert('Please describe your project idea.'); return; }
+  
+  if (!abstract) {
+    return alert('Please describe your project idea.');
+  }
+  
+  // If the user didn't select a suggestion chip (which sets the name), auto-generate one
+  if (!name) {
+    const words = abstract.split(/\s+/);
+    name = words.slice(0, 4).join(" ") + (words.length > 4 ? "..." : "");
+  }
+
+  const btn = document.getElementById('btn-generate');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Generating...';
 
   showPage('guide');
   state.activeSlug    = null;
