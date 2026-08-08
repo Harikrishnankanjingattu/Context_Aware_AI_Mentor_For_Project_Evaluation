@@ -52,51 +52,35 @@
   </section>
 
   <!-- ===== HOME / GENERATE PAGE ===== -->
-  <section id="page-home" class="page premium-bg">
-    <div class="hero-center text-light">
-      <h1 class="hero-title">What will you build today?</h1>
-      <p class="hero-subtitle">Create stunning apps & websites by chatting with AI.</p>
+  <section id="page-home" class="page">
+    <div class="hero-center">
+      <h1 class="hero-title">What's your next project?</h1>
+      <p class="hero-subtitle">Describe your idea and Luca will generate a complete, step-by-step roadmap with time estimates and difficulty ratings.</p>
 
-      <input type="hidden" id="input-name" value="" />
-      
-      <div class="dark-ask-box" id="ask-box">
-        <div class="dark-ask-input-wrap">
-          <button class="dark-btn-icon"><i class="fa-solid fa-plus"></i></button>
-          <textarea id="input-abstract" class="dark-ask-input" placeholder="Let's build a" rows="1" oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
-        </div>
-        <div class="dark-ask-actions">
-          <span class="dark-plan-text"><i class="fa-regular fa-lightbulb"></i> Plan</span>
-          <button class="dark-btn-submit" id="btn-generate" onclick="startGeneration()">
-            Build now <i class="fa-solid fa-location-arrow"></i>
+      <div class="ask-box" id="ask-box">
+        <input type="text" id="input-name" class="ask-name" placeholder="Project name..." />
+        <textarea id="input-abstract" class="ask-textarea" placeholder="Describe your project idea in detail..." rows="3"></textarea>
+        <div class="ask-actions">
+          <button class="btn-primary" id="btn-generate" onclick="startGeneration()">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Guide
           </button>
         </div>
       </div>
 
       <!-- Suggestion chips -->
-      <div class="dark-suggestion-grid">
-        <button class="dark-chip" onclick="fillExample('Website','A modern, responsive website with a beautiful landing page and contact form.')">
-          <i class="fa-solid fa-globe"></i>
-          <span>Website</span>
+      <div class="suggestion-chips">
+        <button class="chip" onclick="fillExample('Medical College Chatbot','An AI chatbot for medical college students to get help with study topics, exam schedules, and campus resources.')">
+          <i class="fa-solid fa-stethoscope"></i> Medical Chatbot
         </button>
-        <button class="dark-chip" onclick="fillExample('Slides','A presentation slide deck covering system architecture and data flow.')">
-          <i class="fa-solid fa-person-chalkboard"></i>
-          <span>Slides</span>
-          <div class="dark-chip-badge">New</div>
+        <button class="chip" onclick="fillExample('E-commerce Platform','A full-featured online store with product listings, cart, checkout, and order tracking for a local business.')">
+          <i class="fa-solid fa-bag-shopping"></i> E-commerce Store
         </button>
-        <button class="dark-chip" onclick="fillExample('App','A mobile application for managing daily tasks and habit tracking.')">
-          <i class="fa-solid fa-mobile-screen"></i>
-          <span>App</span>
+        <button class="chip" onclick="fillExample('Student Task Manager','A web app for students to manage daily assignments, track deadlines, and get reminder notifications.')">
+          <i class="fa-solid fa-check-double"></i> Task Manager
         </button>
-        <button class="dark-chip" onclick="fillExample('Prototype','A functional prototype for a new e-commerce storefront with a shopping cart.')">
-          <i class="fa-solid fa-flask"></i>
-          <span>Prototype</span>
+        <button class="chip" onclick="fillExample('Portfolio Website','A personal developer portfolio website with project gallery, skills section, blog, and contact form.')">
+          <i class="fa-solid fa-globe"></i> Portfolio Site
         </button>
-      </div>
-
-      <div class="dark-import-section">
-        or import from 
-        <button class="dark-import-btn"><i class="fa-brands fa-figma"></i> Figma</button>
-        <button class="dark-import-btn" onclick="editGitHubUrl()"><i class="fa-brands fa-github"></i> GitHub</button>
       </div>
     </div>
   </section>
